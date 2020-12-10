@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="rcore-domain-picture" />
+        <module name="rcore-database-mongo-commons" />
+        <module name="rcore-database-mongo-auth" />
+        <module name="rcore-domain-security" />
+        <module name="rcore-commons" />
+        <module name="rcore-rest-api-commons" />
+        <module name="rcore-domain-commons" />
+        <module name="ftl_auth_service" />
+        <module name="auth-api" />
+        <module name="rcore-domain-auth" />
+        <module name="rcore-domain-file" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="adapter" target="11" />
+      <module name="admin-core" target="11" />
+      <module name="commons" target="11" />
+      <module name="database" target="1.5" />
+      <module name="domain" target="11" />
+      <module name="memory" target="11" />
+      <module name="mongo" target="11" />
+      <module name="rest-api" target="11" />
+      <module name="security" target="1.5" />
+      <module name="security-infrastructure" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="auth-api" options="-parameters" />
+      <module name="rest-api" options="-parameters" />
+    </option>
+  </component>
+</project>

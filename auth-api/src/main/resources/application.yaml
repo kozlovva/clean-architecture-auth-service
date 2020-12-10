@@ -1,0 +1,4 @@
+ftl:
+  security:
+    jwt:
+      secret: secret01234567890ABCDEFGHIJKLMNO
