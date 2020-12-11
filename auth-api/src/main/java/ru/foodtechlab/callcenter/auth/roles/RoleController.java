@@ -8,6 +8,7 @@ import com.rcore.rest.api.commons.response.SuccessApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
+import ru.foodtechlab.callcenter.auth.config.security.UserPrincipal;
 import ru.foodtechlab.callcenter.auth.roles.request.CreateRoleRequest;
 import ru.foodtechlab.callcenter.auth.roles.response.RoleResponse;
 
@@ -22,7 +23,7 @@ public class RoleController implements RoleResource {
     private final CreateRoleUseCase createRoleUseCase;
 
     @Override
-    public CompletableFuture<SuccessApiResponse<RoleResponse>> findById(String id) {
+    public CompletableFuture<SuccessApiResponse<RoleResponse>> findById(UserPrincipal userPrincipal, String id) {
         return useCaseExecutor.execute(
                 findRoleByIdUseCase,
                 AbstractFindByIdUseCase.InputValues.of(id),

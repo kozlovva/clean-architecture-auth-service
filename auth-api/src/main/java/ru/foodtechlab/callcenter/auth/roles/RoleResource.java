@@ -5,6 +5,8 @@ import com.rcore.rest.api.commons.routes.BaseRoutes;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.foodtechlab.callcenter.auth.config.security.CurrentUser;
+import ru.foodtechlab.callcenter.auth.config.security.UserPrincipal;
 import ru.foodtechlab.callcenter.auth.roles.request.CreateRoleRequest;
 import ru.foodtechlab.callcenter.auth.roles.response.RoleResponse;
 
@@ -14,12 +16,10 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 public interface RoleResource {
 
-    public final String RESOURCE = "/roles";
+    @GetMapping(value = Routes.BY_ID)
+    CompletableFuture<SuccessApiResponse<RoleResponse>> findById(@CurrentUser UserPrincipal userPrincipal, @PathVariable String id);
 
-    @GetMapping(value = BaseRoutes.API + BaseRoutes.V1 + RESOURCE + "/{id}")
-    CompletableFuture<SuccessApiResponse<RoleResponse>> findById(@PathVariable String id);
-
-    @PostMapping(value = BaseRoutes.API + BaseRoutes.V1 + RESOURCE)
+    @PostMapping(value = Routes.ROOT)
     CompletableFuture<SuccessApiResponse<RoleResponse>> create(@RequestBody CreateRoleRequest createRoleRequest);
 
 }

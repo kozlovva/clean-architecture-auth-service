@@ -2,17 +2,18 @@ package ru.foodtechlab.callcenter.auth.config;
 
 import com.rcore.domain.auth.authorization.port.AuthorizationIdGenerator;
 import com.rcore.domain.auth.authorization.port.AuthorizationRepository;
-import com.rcore.domain.auth.authorization.usecases.CreateAuthorizationUseCase;
-import com.rcore.domain.auth.authorization.usecases.PasswordAuthorizationUseCase;
+import com.rcore.domain.auth.authorization.usecases.*;
+import com.rcore.domain.auth.confirmationCode.port.ConfirmationCodeGenerator;
+import com.rcore.domain.auth.confirmationCode.port.ConfirmationCodeIdGenerator;
+import com.rcore.domain.auth.confirmationCode.port.ConfirmationCodeRepository;
+import com.rcore.domain.auth.confirmationCode.port.impl.ConfirmationCodeGeneratorImpl;
+import com.rcore.domain.auth.confirmationCode.usecases.CreateConfirmationCodeUseCase;
 import com.rcore.domain.auth.credential.port.CredentialIdGenerator;
 import com.rcore.domain.auth.credential.port.CredentialRepository;
 import com.rcore.domain.auth.credential.port.PasswordCryptographer;
 import com.rcore.domain.auth.credential.port.impl.CredentialServiceImpl;
 import com.rcore.domain.auth.credential.port.impl.PasswordCryptographerImpl;
-import com.rcore.domain.auth.credential.usecases.CreateCredentialUseCase;
-import com.rcore.domain.auth.credential.usecases.FindCredentialByEmailUseCase;
-import com.rcore.domain.auth.credential.usecases.FindCredentialByPhoneUseCase;
-import com.rcore.domain.auth.credential.usecases.FindCredentialByUsernameUseCase;
+import com.rcore.domain.auth.credential.usecases.*;
 import com.rcore.domain.auth.role.port.RoleIdGenerator;
 import com.rcore.domain.auth.role.port.RoleRepository;
 import com.rcore.domain.auth.role.usecases.CreateRoleUseCase;
@@ -47,8 +48,13 @@ public class UseCasesConfig {
     }
 
     @Bean
-    public CredentialService credentialService(CredentialRepository credentialRepository, TokenConverter<AccessTokenData> tokenConverter, RoleRepository roleRepository) {
-        return new CredentialServiceImpl(credentialRepository, tokenConverter, roleRepository);
+    public ConfirmationCodeGenerator confirmationCodeGenerator() {
+        return new ConfirmationCodeGeneratorImpl(4);
+    }
+
+    @Bean
+    public CredentialService credentialService(CredentialRepository credentialRepository, TokenConverter<AccessTokenData> tokenConverter, RoleRepository roleRepository, AccessTokenRepository accessTokenRepository) {
+        return new CredentialServiceImpl(credentialRepository, tokenConverter, roleRepository, accessTokenRepository);
     }
 
     @Bean
@@ -154,6 +160,48 @@ public class UseCasesConfig {
             CreateAccessTokenUseCase createAccessTokenUseCase
     ) {
         return new RefreshAccessTokenUseCase(tokenConverter, credentialRepository, refreshTokenRepository, expireRefreshTokenUseCase, createAccessTokenUseCase);
+    }
+
+    @Bean
+    public LogoutUseCase logoutUseCase(TokenConverter<AccessTokenData> accessTokenDataTokenConverter, RefreshTokenRepository refreshTokenRepository, AccessTokenRepository accessTokenRepository) {
+        return new LogoutUseCase(accessTokenDataTokenConverter, refreshTokenRepository, accessTokenRepository);
+    }
+
+    @Bean
+    public CreateConfirmationCodeUseCase createConfirmationCodeUseCase(ConfirmationCodeRepository confirmationCodeRepository, ConfirmationCodeIdGenerator confirmationCodeIdGenerator, ConfirmationCodeGenerator confirmationCodeGenerator) {
+        return new CreateConfirmationCodeUseCase(confirmationCodeRepository, confirmationCodeIdGenerator, confirmationCodeGenerator);
+    }
+
+    @Bean
+    public InitTwoFactorAuthorizationUseCase initTwoFactorAuthorizationUseCase(CreateAuthorizationUseCase createAuthorizationUseCase, CreateConfirmationCodeUseCase createConfirmationCodeUseCase, FindCredentialByEmailUseCase findCredentialByEmailUseCase, FindCredentialByPhoneUseCase findCredentialByPhoneUseCase) {
+        return new InitTwoFactorAuthorizationUseCase(createAuthorizationUseCase, createConfirmationCodeUseCase, findCredentialByEmailUseCase, findCredentialByPhoneUseCase);
+    }
+
+    @Bean
+    public FindAuthorizationByIdUseCase findAuthorizationByIdUseCase(AuthorizationRepository authorizationRepository) {
+        return new FindAuthorizationByIdUseCase(authorizationRepository);
+    }
+
+    @Bean
+    public FindCredentialByIdUseCase findCredentialByIdUseCase(CredentialRepository credentialRepository) {
+        return new FindCredentialByIdUseCase(credentialRepository);
+    }
+
+    @Bean
+    public TransferAuthorizationToSuccessStatusUseCase transferAuthorizationToSuccessStatusUseCase(AuthorizationRepository authorizationRepository) {
+        return new TransferAuthorizationToSuccessStatusUseCase(authorizationRepository);
+    }
+
+    @Bean
+    public ConfirmTwoFactorAuthorizationUseCase confirmTwoFactorAuthorizationUseCase(
+            ConfirmationCodeRepository confirmationCodeRepository,
+            FindAuthorizationByIdUseCase findAuthorizationByIdUseCase,
+            FindCredentialByIdUseCase findCredentialByIdUseCase,
+            CreateAccessTokenUseCase createAccessTokenUseCase,
+            CreateRefreshTokenUseCase createRefreshTokenUseCase,
+            TransferAuthorizationToSuccessStatusUseCase transferAuthorizationToSuccessStatusUseCase
+    ) {
+        return new ConfirmTwoFactorAuthorizationUseCase(confirmationCodeRepository, findAuthorizationByIdUseCase, findCredentialByIdUseCase, createAccessTokenUseCase, createRefreshTokenUseCase, transferAuthorizationToSuccessStatusUseCase);
     }
 
 }
